@@ -2,6 +2,22 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
+aliases:
+  # common - cache
+  - &cache_restore_git
+    restore_cache:
+      name: cache | restore git
+      keys:
+        - src-v1-{{ arch }}-{{ .Branch }}-{{ .Revision }}
+        - src-v1-{{ arch }}-{{ .Branch }}-
+        - src-v1-{{ arch }}
+  - &cache_save_git
+    save_cache:
+      name: cache | save git
+      key: src-v1-{{ arch }}-{{ .Branch }}-{{ .Revision }}
+      paths:
+        - ".git"
+
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
 jobs:
@@ -13,7 +29,9 @@ jobs:
     # Add steps to the job
     # See: https://circleci.com/docs/configuration-reference/#steps
     steps:
+      - *cache_restore_git
       - checkout
+      - *cache_save_git
       - run:
           name: "Say hello"
           command: "echo Hello, World!"
